@@ -11,6 +11,7 @@
   "dependencies": {
     "expo": "~50.0.11",
     "expo-status-bar": "~1.11.1",
+    "galio-framework": "^0.8.0",
     "react": "18.2.0",
     "react-native": "0.73.4"
   },
