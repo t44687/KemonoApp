@@ -1,24 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import {StyleSheet, View} from 'react-native';
 import { Block, Button, Card, Icon, Input, NavBar, Text } from 'galio-framework';
-import KemonoNavBar from "./assets/Component/KemonoNavBar";
+import KemonoNavBar from "./Component/KemonoNavBar";
 import {NavigationContainer} from "@react-navigation/native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomePage from "./assets/Page/HomePage";
+import HomeScreen from "./Screens/HomeScreen/HomeScreen";
 import React from "react";
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#1D1F20',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-    },
-    text: {
-        color: '#fff'
-    }
-});
+import ArtistsScreen from "./Screens/ArtistsScreen/ArtistsScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -31,7 +20,7 @@ export default function App() {
           <Drawer.Navigator>
               <Drawer.Screen
                   name="Home"
-                  component={HomePage}
+                  component={HomeScreen}
                   options={{
                       headerStyle: {
                           backgroundColor: '#282a2e',
@@ -39,6 +28,18 @@ export default function App() {
                       headerTitle: (props) =>
                           <KemonoNavBar />
                   }}
+              />
+              <Drawer.Screen
+                  name="Artists"
+                  component={ArtistsScreen}
+                  options={{
+                      headerStyle: {
+                          backgroundColor: '#282a2e',
+                      },
+                      headerTitle: (props) =>
+                          <KemonoNavBar />
+                  }}
+                  initialParams={{'startIndex': 0}}
               />
           </Drawer.Navigator>
       </NavigationContainer>
