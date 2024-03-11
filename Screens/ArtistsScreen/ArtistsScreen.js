@@ -4,12 +4,17 @@ import {useEffect, useState} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Card, Text} from "galio-framework";
 import styles from "./Styles/ArtistsScreenStyles"
-import * as FileSystem from "expo-file-system"
-import {EncodingType} from "expo-file-system";
-import {log} from "expo/build/devtools/logger";
 
 export default function ArtistsScreen({ navigation, route }){
     const [creaters, setCreaters] = useState([])
+    const [useCache, setUseCache] = useState(true)
+
+    const cachedCreators = require('../../assets/Cache/creators.json')
+
+    const setCreatersWithFilters = (loadedCreaters) => {
+        let sortedCreaters = loadedCreaters.sort((a,b) => b.favorited - a.favorited)
+        setCreaters(sortedCreaters)
+    }
 
     const getCreators = () => {
         console.log("get creators")
@@ -17,11 +22,8 @@ export default function ArtistsScreen({ navigation, route }){
         return fetch('https://kemono.su/api/v1/creators')
             .then(response => response.json())
             .then(json => {
-                AsyncStorage.setItem('creators', json)
-                let sortedJson = json.sort((a,b) => b.favorited - a.favorited)
-                console.log(sortedJson[0])
-                setCreaters(sortedJson)
-                console.log("got creators")
+                setCreatersWithFilters(json)
+                setUseCache(false)
             })
             .catch(error => {
                 console.error(error)
@@ -58,8 +60,17 @@ export default function ArtistsScreen({ navigation, route }){
         )
     }
     const CurrentIndex = () => {
+        let indexMsg = ""
+
+        if (useCache){
+            console.log("using cache")
+            indexMsg = "Using cache for now, please wait"
+        }else{
+            indexMsg = "Showing "+(getStartIndex()+1)+" - "+getEndIndex()+" of "+creaters.length
+        }
+
         return <Text style={{"color":"#fff"}}>
-            {"Showing "+(getStartIndex()+1)+" - "+getEndIndex()+" of "+creaters.length}
+            {indexMsg}
         </Text>
     }
 
@@ -81,26 +92,14 @@ export default function ArtistsScreen({ navigation, route }){
     }
 
     useEffect(() => {
-        AsyncStorage.getItem('creators')
-            .then(json => {
-                console.log("cached creators: " + json)
-                if (json == null){
-                    getCreators()
-                }else {
-                    json = JSON.parse(json)
-                    setCreaters(json.sort((a,b) => {
-                        a.favorited > b.favorited
-                    }))
-                }
-            })
-        // getCreators()
+        setCreatersWithFilters(cachedCreators)
+        getCreators()
     }, []);
 
     return (
         <View style={GlobalStyles.container}>
             <CurrentIndex />
             {generateArtistsCard()}
-            <CurrentIndex />
         </View>
     )
 }
