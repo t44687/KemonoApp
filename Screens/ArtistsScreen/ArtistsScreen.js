@@ -1,18 +1,30 @@
-import {Alert, FlatList, Pressable, View} from "react-native";
+import {Alert, FlatList, ImageBackground, Pressable, View} from "react-native";
 import GlobalStyles from "../../Style/GlobalStyles";
 import {useEffect, useState} from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Card, Text} from "galio-framework";
 import styles from "./Styles/ArtistsScreenStyles"
+import * as FileSystem from "expo-file-system"
+import {EncodingType} from "expo-file-system";
 import {log} from "expo/build/devtools/logger";
 
 export default function ArtistsScreen({ navigation, route }){
     const [creaters, setCreaters] = useState([])
 
     const getCreators = () => {
-        return fetch('https://kemono.su/api/v1/creators.txt')
+        console.log("get creators")
+
+        return fetch('https://kemono.su/api/v1/creators')
             .then(response => response.json())
             .then(json => {
-                setCreaters(json)
+                AsyncStorage.setItem('creators', json)
+                let sortedJson = json.sort((a,b) => b.favorited - a.favorited)
+                console.log(sortedJson[0])
+                setCreaters(sortedJson)
+                console.log("got creators")
+            })
+            .catch(error => {
+                console.error(error)
             })
     }
     const getStartIndex = () => {
@@ -47,7 +59,7 @@ export default function ArtistsScreen({ navigation, route }){
     }
     const CurrentIndex = () => {
         return <Text style={{"color":"#fff"}}>
-            {"Showing "+getStartIndex()+" - "+getEndIndex()+" of "+creaters.length}
+            {"Showing "+(getStartIndex()+1)+" - "+getEndIndex()+" of "+creaters.length}
         </Text>
     }
 
@@ -69,11 +81,20 @@ export default function ArtistsScreen({ navigation, route }){
     }
 
     useEffect(() => {
-        getCreators()
+        AsyncStorage.getItem('creators')
+            .then(json => {
+                console.log("cached creators: " + json)
+                if (json == null){
+                    getCreators()
+                }else {
+                    json = JSON.parse(json)
+                    setCreaters(json.sort((a,b) => {
+                        a.favorited > b.favorited
+                    }))
+                }
+            })
+        // getCreators()
     }, []);
-    // useEffect(() => {
-    //     generateArtistsCard()
-    // }, [creaters]);
 
     return (
         <View style={GlobalStyles.container}>

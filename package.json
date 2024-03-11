@@ -9,10 +9,13 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "1.21.0",
+    "@react-navigation/bottom-tabs": "^6.5.18",
     "@react-navigation/drawer": "^6.6.12",
     "@react-navigation/native": "^6.1.15",
     "@react-navigation/native-stack": "^6.9.23",
     "expo": "~50.0.11",
+    "expo-file-system": "~16.0.8",
     "expo-status-bar": "~1.11.1",
     "galio-framework": "^0.8.0",
     "react": "18.2.0",

@@ -1,7 +1,6 @@
 import {Block, Button, Icon, NavBar, Text, theme} from "galio-framework";
-import {FlatList, StyleSheet} from "react-native";
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import {FlatList, Pressable, StyleSheet} from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
 const styles = StyleSheet.create({
     navbar: {
@@ -18,34 +17,41 @@ const styles = StyleSheet.create({
 });
 
 const navBarData = [
-    {navigate: '1', text: 'Home'},
-    {navigate: '2', text: 'Artists'},
-    {navigate: '3', text: 'Posts'},
+    {navigate: 'Home', text: 'Home'},
+    {navigate: 'Artists', text: 'Artists'},
+    {navigate: 'Posts', text: 'Posts'},
     {navigate: '4', text: 'Import'},
     {navigate: '5', text: 'Favorites'},
     {navigate: '6', text: 'Logout'},
 ]
 
-const navbarRenderItem = ({item}) => {
+const NavbarRenderItem = ({item, navigation}) => {
     return <Block flex style={styles.navbarItem}>
-        <Text style={styles.navbarText}>
-            {item.text}
-        </Text>
+        <Pressable onPress={() => navigation.navigate(item.navigate)}>
+            <Text style={styles.navbarText}>
+                {item.text}
+            </Text>
+        </Pressable>
     </Block>
 }
 
-const NavBarContent = () => {
+const NavBarContent = ({navigation}) => {
     return <FlatList
         horizontal
         data={navBarData}
-        renderItem={navbarRenderItem}
+        renderItem={(props) =>
+            <NavbarRenderItem
+                item={props.item}
+                navigation={navigation}
+            />
+    }
     />
 }
 
-const Drawer = createDrawerNavigator()
-
 export default function KemonoNavBar(){
+    const navigation = useNavigation()
+
     return <Block style={styles.navbar}>
-        <NavBarContent />
+        <NavBarContent navigation={navigation} />
     </Block>
 }

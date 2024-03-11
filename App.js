@@ -8,6 +8,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from "./Screens/HomeScreen/HomeScreen";
 import React from "react";
 import ArtistsScreen from "./Screens/ArtistsScreen/ArtistsScreen";
+import PostsScreen from "./Screens/PostsScreen/PostsScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -40,6 +41,17 @@ export default function App() {
                           <KemonoNavBar />
                   }}
                   initialParams={{'startIndex': 0}}
+              />
+              <Drawer.Screen
+                  name="Posts"
+                  component={PostsScreen}
+                  options={{
+                      headerStyle: {
+                          backgroundColor: '#282a2e',
+                      },
+                      headerTitle: (props) =>
+                          <KemonoNavBar />
+                  }}
               />
           </Drawer.Navigator>
       </NavigationContainer>
