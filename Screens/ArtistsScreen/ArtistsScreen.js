@@ -1,13 +1,16 @@
 import {Alert, FlatList, ImageBackground, Pressable, View} from "react-native";
 import GlobalStyles from "../../Style/GlobalStyles";
-import {useEffect, useState} from "react";
+import {PureComponent, useEffect, useState} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Card, Text} from "galio-framework";
 import styles from "./Styles/ArtistsScreenStyles"
+import Pagination from "../../Component/Pagination";
+import ArtistCard from "../../Component/ArtistCard"
 
 export default function ArtistsScreen({ navigation, route }){
     const [creaters, setCreaters] = useState([])
     const [useCache, setUseCache] = useState(true)
+    const [startIndex, setStartIndex] = useState(0)
 
     const cachedCreators = require('../../assets/Cache/creators.json')
 
@@ -30,43 +33,45 @@ export default function ArtistsScreen({ navigation, route }){
             })
     }
     const getStartIndex = () => {
-        let {startIndex} = route.params
-        if (startIndex === undefined){
-            startIndex = 0
+        let {startIndexParam} = route.params
+        if (startIndexParam === undefined){
+            startIndexParam = 0
         }
-        return startIndex
+        setStartIndex(startIndexParam)
     }
     const getEndIndex = () => {
-        let endIndex = getStartIndex() + 50
+        let endIndex = startIndex + 50
         if (endIndex > creaters.length){
             endIndex = creaters.length
         }
         return endIndex
     }
+    const onPageChange = (pageIndex) => {
+        let newStartIndex = (pageIndex-1)*50
+
+        if (newStartIndex !== startIndex){
+            setStartIndex(newStartIndex)
+        }
+    }
+
     const createArtistCard = (artist) => {
 
         return (
-            <Pressable onPress={() => Alert.alert('test', artist.item.id)}>
-                <Card
-                    flex
-                    style={styles.card}
-                    titleColor={'#fff'}
-                    title={artist.item.name}
-                    caption={artist.item.favorited + " favorited"}
-                    image={"https://img.kemono.su/banners/"+artist.item.service+"/"+artist.item.id}
-                    avatar={"https://img.kemono.su/icons/"+artist.item.service+"/"+artist.item.id}
-                />
-            </Pressable>
+            <ArtistCard
+                id={artist.item.id}
+                name={artist.item.name}
+                favorited={artist.item.favorited}
+                service={artist.item.service}
+            />
         )
     }
     const CurrentIndex = () => {
         let indexMsg = ""
 
         if (useCache){
-            console.log("using cache")
             indexMsg = "Using cache for now, please wait"
         }else{
-            indexMsg = "Showing "+(getStartIndex()+1)+" - "+getEndIndex()+" of "+creaters.length
+            indexMsg = "Showing "+(startIndex+1)+" - "+getEndIndex()+" of "+creaters.length
         }
 
         return <Text style={{"color":"#fff"}}>
@@ -75,8 +80,6 @@ export default function ArtistsScreen({ navigation, route }){
     }
 
     const generateArtistsCard = () => {
-        let startIndex = getStartIndex()
-
         let endIndex = getEndIndex()
 
         let artistsCards = []
@@ -88,11 +91,20 @@ export default function ArtistsScreen({ navigation, route }){
             style={styles.container}
             data={artistsCards}
             renderItem={createArtistCard}
+            ListFooterComponent={
+                <Pagination
+                    currentPage={(startIndex / 50)+1}
+                    total={creaters.length}
+                    maxPageShown={5}
+                    onPageChange={(pageIndex) => onPageChange(pageIndex)}
+                />
+        }
         />
     }
 
     useEffect(() => {
         setCreatersWithFilters(cachedCreators)
+        getStartIndex()
         getCreators()
     }, []);
 
