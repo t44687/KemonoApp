@@ -62,6 +62,13 @@ export default function ArtistsScreen({ navigation, route }){
                 name={artist.item.name}
                 favorited={artist.item.favorited}
                 service={artist.item.service}
+                onClick={(id, service) => navigation.navigate(
+                    'ArtistDetailScreen',
+                    {
+                        artistId: id,
+                        service: service
+                    }
+                )}
             />
         )
     }
@@ -98,7 +105,7 @@ export default function ArtistsScreen({ navigation, route }){
                     maxPageShown={5}
                     onPageChange={(pageIndex) => onPageChange(pageIndex)}
                 />
-        }
+            }
         />
     }
 

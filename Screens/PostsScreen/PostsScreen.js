@@ -3,6 +3,7 @@ import {Alert, FlatList, ImageBackground, Pressable, View} from "react-native";
 import {Card} from "galio-framework";
 import styles from "./Styles/PostsScreenStyles"
 import GlobalStyles from "../../Style/GlobalStyles";
+import PostCard from "../../Component/PostCard";
 
 export default function PostsScreen() {
     const [posts, setPosts] = useState()
@@ -16,17 +17,16 @@ export default function PostsScreen() {
 
     const createPostCard = (post) => {
         return (
-            <Pressable onPress={() => Alert.alert('test', post.item.id)}>
-                <Card
-                    flex
-                    style={styles.card}
-                    titleColor={'#fff'}
-                    title={post.item.title}
-                    caption={post.item.attachments.length + " attachments"}
-                    avatar={"https://img.kemono.su/banners/"+post.item.service+"/"+post.item.user}
-                    image={"https://img.kemono.su/thumbnail/data/"+post.item.file.path}
-                />
-            </Pressable>
+            <PostCard
+                id={post.item.id}
+                title={post.item.title}
+                published={post.item.published}
+                attachmentsLength={post.item.attachments.length}
+                service={post.item.service}
+                user={post.item.user}
+                filePath={post.item.file.path}
+                onClick={(id) => Alert.alert('test', id)}
+            />
         )
     }
 

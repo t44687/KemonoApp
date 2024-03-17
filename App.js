@@ -9,6 +9,7 @@ import HomeScreen from "./Screens/HomeScreen/HomeScreen";
 import React from "react";
 import ArtistsScreen from "./Screens/ArtistsScreen/ArtistsScreen";
 import PostsScreen from "./Screens/PostsScreen/PostsScreen";
+import ArtistDetailScreen from "./Screens/ArtistDetailScreen/ArtistDetailScreen";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -46,6 +47,19 @@ export default function App() {
                   name="Posts"
                   component={PostsScreen}
                   options={{
+                      headerStyle: {
+                          backgroundColor: '#282a2e',
+                      },
+                      headerTitle: (props) =>
+                          <KemonoNavBar />
+                  }}
+              />
+              <Drawer.Screen
+                  name="ArtistDetailScreen"
+                  component={ArtistDetailScreen}
+                  options={{
+                      unmountOnBlur: true,
+                      drawerItemStyle: { display: 'none' }, // hidden it in slide menu
                       headerStyle: {
                           backgroundColor: '#282a2e',
                       },
