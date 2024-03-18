@@ -1,12 +1,12 @@
 import GlobalStyles from "../../Style/GlobalStyles";
-import {Alert, Image, SafeAreaView, ScrollView, View} from "react-native";
+import {Alert, Image, Pressable, SafeAreaView, ScrollView, ToastAndroid, View} from "react-native";
 import {useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
 import {Block, Button, Text} from "galio-framework";
 import styles from "./PostDetailScreenStyles";
 import {htmlCodeConvertor} from "../../Component/HtmlCodeConvertor";
 import AutoAdjustHeightImage from "../../Component/AutoAdjustHeightImage";
-import {Video, ResizeMode} from "expo-av";
+import * as FileSystem from "expo-file-system"
 
 export default function () {
     // const video = React.useRef(null);
@@ -24,10 +24,6 @@ export default function () {
             fileName.includes(".jpeg") ||
             fileName.includes(".gif")
     }
-    const isFileVideo = (fileName) => {
-
-        return fileName.includes(".mp4")
-    }
 
     const getPostDetail = () => {
         return fetch(`https://kemono.su/api/v1/${service}/user/${artistId}/post/${postId}`)
@@ -44,6 +40,26 @@ export default function () {
             .catch(error => {
                 console.error(error)
             })
+    }
+    const downloadFile = async (path, filename) => {
+        ToastAndroid.show("Downloading file " + filename, ToastAndroid.SHORT)
+
+        let uri = "https://c6.kemono.su/data" + path + "?f=" + filename
+        console.log(uri)
+        let targetLocation = FileSystem.documentDirectory + filename
+        let downloadObject = FileSystem.createDownloadResumable(
+            uri,
+            targetLocation,
+            {},
+            // process => console.log(process.totalBytesExpectedToWrite)
+        )
+
+        try {
+            await downloadObject.downloadAsync()
+            Alert.alert("Success", `File ${filename} download succeed\nSaved to: ${targetLocation}`)
+        } catch (e) {
+            Alert.alert("Fail", `File ${filename} download failed, error:\n${e}`)
+        }
     }
 
     const CreaterInfo = () => {
@@ -100,35 +116,24 @@ export default function () {
             {Images}
         </Block>
     }
-
-    const PostContentAttachmentsVideos = () => {
+    const PostContentAttachmentsFileDownloads = () => {
         if (postData["attachments"] === undefined){
             return null
         }
 
-        let Videos = postData["attachments"].map((attachment) => {
-
-            if (isFileVideo(attachment["name"])){
-                return <Video
-                    style={styles.postContentAttachmentsVideo}
-                    source={{
-                        uri: `https://c6.kemono.su/data/${attachment["path"]}`,
-                    }}
-                    useNativeControls
-                    resizeMode={ResizeMode.CONTAIN}
-                    onError={(error) => console.log(error)}
-                    onLoad={status => console.log(status)}
-                />
-            }
+        let FileDownloads = postData["attachments"].map((attachment) => {
+            return <Pressable onPress={() => downloadFile(attachment["path"], attachment["name"])}>
+                <Text style={styles.postContentFileDownloadsText}>{attachment["name"]}</Text>
+            </Pressable>
         })
 
-        if (Videos.length === 0){
+        if (FileDownloads.length === 0){
             return null
         }
 
-        return <Block>
-            <Text style={[styles.postContentText, styles.postContentFile]}>Videos</Text>
-            {Videos}
+        return <Block style={styles.postContentFileDownloadsBlock}>
+            <Text style={[styles.postContentText, styles.postContentFile]}>Downloads</Text>
+            {FileDownloads}
         </Block>
     }
 
@@ -137,10 +142,10 @@ export default function () {
         return <Block style={styles.postContentBlock}>
             <Text style={[styles.postContentText, styles.postContentContent]}>Content</Text>
             <Text style={[styles.postContentText]}>{htmlCodeConvertor(postData["content"])}</Text>
+            <PostContentAttachmentsFileDownloads />
             <Text style={[styles.postContentText, styles.postContentFile]}>Files</Text>
             {postData["file"] !== undefined && <AutoAdjustHeightImage styles={styles.postContentFileImage} uri={`https://img.kemono.su/thumbnail/data/${postData["file"]["path"]}`} />}
             <PostContentAttachmentsImages />
-            <PostContentAttachmentsVideos />
         </Block>
     }
 

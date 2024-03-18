@@ -110,8 +110,14 @@ export default StyleSheet.create({
         marginTop: 5,
         marginBottom: 10
     },
-    postContentAttachmentsVideo: {
-        width: 100,
-        height: 100
+
+    postContentFileDownloadsBlock: {
+        width: "100%",
+        marginTop: 10,
+        marginBottom: 10
+    },
+    postContentFileDownloadsText: {
+        padding: 5,
+        color: "#7db2e8"
     }
 });
