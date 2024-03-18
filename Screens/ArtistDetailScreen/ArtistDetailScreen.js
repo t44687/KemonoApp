@@ -1,12 +1,10 @@
 import {Block, Button, Card, Text} from "galio-framework";
 import {useEffect, useState} from "react";
 import {useRoute} from "@react-navigation/native";
-import {Alert, FlatList, Image, ImageBackground, View} from "react-native";
+import {Alert, FlatList, Image, View} from "react-native";
 import GlobalStyles from "../../Style/GlobalStyles";
 import styles from "./Styles/ArtistDetailScreenStyles"
-import ArtistCard from "../../Component/ArtistCard";
 import PostCard from "../../Component/PostCard";
-import Pagination from "../../Component/Pagination";
 
 export default function (){
     const [artistData, setArtistData] = useState({})
@@ -32,14 +30,6 @@ export default function (){
             .catch(error => {
                 console.error(error)
             })
-    }
-
-    const onPageChange = (pageIndex) => {
-        let newStartIndex = (pageIndex-1)*50
-
-        if (newStartIndex !== startIndex){
-            setStartIndex(newStartIndex)
-        }
     }
 
     const createPostCard = (post) => {
@@ -128,7 +118,6 @@ export default function (){
 
     return (
         <View style={GlobalStyles.container}>
-            {/*<ArtistInfo />*/}
             <FlatList
                 style={styles.container}
                 data={postList}
