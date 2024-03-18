@@ -9,6 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.24.0",
+    "@babel/runtime-corejs3": "^7.24.0",
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-masked-view/masked-view": "0.3.0",
     "@react-navigation/bottom-tabs": "^6.5.18",
@@ -16,8 +18,10 @@
     "@react-navigation/native": "^6.1.15",
     "@react-navigation/native-stack": "^6.9.23",
     "expo": "~50.0.13",
+    "expo-av": "~13.10.5",
     "expo-file-system": "~16.0.8",
     "expo-status-bar": "~1.11.1",
+    "fs": "^0.0.1-security",
     "galio-framework": "^0.8.0",
     "react": "18.2.0",
     "react-native": "0.73.5",
@@ -25,10 +29,11 @@
     "react-native-reanimated": "~3.6.2",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
-    "react-navigation": "^5.0.0"
+    "react-navigation": "^5.0.0",
+    "rn-nodeify": "^10.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
+    "@babel/core": "^7.24.0",
     "babel-plugin-module-resolver": "^5.0.0"
   },
   "private": true

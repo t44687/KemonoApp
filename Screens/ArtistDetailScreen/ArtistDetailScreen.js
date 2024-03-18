@@ -1,6 +1,6 @@
 import {Block, Button, Card, Text} from "galio-framework";
 import {useEffect, useState} from "react";
-import {useRoute} from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import {Alert, FlatList, Image, View} from "react-native";
 import GlobalStyles from "../../Style/GlobalStyles";
 import styles from "./Styles/ArtistDetailScreenStyles"
@@ -11,6 +11,7 @@ export default function (){
     const [postList, setPostList] = useState([])
     const [startIndex, setStartIndex] = useState(0)
 
+    const navigation = useNavigation()
     const route = useRoute()
     const {artistId, service} = route.params
 
@@ -45,7 +46,14 @@ export default function (){
             service={post.item.service}
             user={post.item.user}
             filePath={post.item.file.path}
-            onClick={(id) => Alert.alert('test', id)}
+            onClick={(id) => navigation.navigate(
+                'PostDetailScreen',
+                {
+                    postId: id,
+                    artistId: artistId,
+                    service: service
+                }
+            )}
         />
     }
 
