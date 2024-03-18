@@ -16,7 +16,6 @@
     "@react-navigation/native": "^6.1.15",
     "@react-navigation/native-stack": "^6.9.23",
     "expo": "~50.0.13",
-    "expo-av": "^13.10.5",
     "expo-file-system": "~16.0.8",
     "expo-status-bar": "~1.11.1",
     "galio-framework": "^0.8.0",
