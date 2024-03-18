@@ -7,8 +7,6 @@ import styles from "./PostDetailScreenStyles";
 import {htmlCodeConvertor} from "../../Component/HtmlCodeConvertor";
 import AutoAdjustHeightImage from "../../Component/AutoAdjustHeightImage";
 import {Video, ResizeMode} from "expo-av";
-import {log} from "expo/build/devtools/logger";
-import {stat} from "@babel/core/lib/gensync-utils/fs";
 
 export default function () {
     // const video = React.useRef(null);
