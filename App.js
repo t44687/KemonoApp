@@ -18,8 +18,8 @@ const Drawer = createDrawerNavigator();
 export default function App() {
   return (
       <NavigationContainer>
-          <Drawer.Navigator>
-              <Drawer.Screen
+          <Stack.Navigator>
+              <Stack.Screen
                   name="Home"
                   component={HomeScreen}
                   options={{
@@ -30,7 +30,7 @@ export default function App() {
                           <KemonoNavBar />
                   }}
               />
-              <Drawer.Screen
+              <Stack.Screen
                   name="Artists"
                   component={ArtistsScreen}
                   options={{
@@ -42,7 +42,7 @@ export default function App() {
                   }}
                   initialParams={{'startIndex': 0}}
               />
-              <Drawer.Screen
+              <Stack.Screen
                   name="Posts"
                   component={PostsScreen}
                   options={{
@@ -53,7 +53,7 @@ export default function App() {
                           <KemonoNavBar />
                   }}
               />
-              <Drawer.Screen
+              <Stack.Screen
                   name="ArtistDetailScreen"
                   component={ArtistDetailScreen}
                   options={{
@@ -66,7 +66,7 @@ export default function App() {
                           <KemonoNavBar />
                   }}
               />
-              <Drawer.Screen
+              <Stack.Screen
                   name="PostDetailScreen"
                   component={PostDetailScreen}
                   options={{
@@ -79,7 +79,7 @@ export default function App() {
                           <KemonoNavBar />
                   }}
               />
-          </Drawer.Navigator>
+          </Stack.Navigator>
       </NavigationContainer>
   );
 }
