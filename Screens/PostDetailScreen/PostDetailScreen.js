@@ -1,19 +1,22 @@
 import GlobalStyles from "../../Style/GlobalStyles";
-import {Alert, Image, Pressable, SafeAreaView, ScrollView, ToastAndroid, View} from "react-native";
-import {useRoute} from "@react-navigation/native";
+import {Alert, Image, Platform, Pressable, SafeAreaView, ScrollView, ToastAndroid, View} from "react-native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {Block, Button, Text} from "galio-framework";
+import {Block, Button, Text, Slider} from "galio-framework";
 import styles from "./PostDetailScreenStyles";
 import {htmlCodeConvertor} from "../../Component/HtmlCodeConvertor";
 import AutoAdjustHeightImage from "../../Component/AutoAdjustHeightImage";
 import * as FileSystem from "expo-file-system"
+import HDImageViewerPopup from "../../Component/HDImageViewerPopup";
 
 export default function () {
-    // const video = React.useRef(null);
-
     const [postData, setPostData] = useState({})
     const [artistData, setArtistData] = useState({})
+    const [downloadProcess, setDownloadProcess] = useState(0)
+    const [showDownloadPopup, setShowDownloadPopup] = useState(false)
+    const [detailImageUri, setDetailImageUri] = useState("")
 
+    const navigation = useNavigation()
     const route = useRoute()
     const {postId, artistId, service} = route.params
 
@@ -42,7 +45,8 @@ export default function () {
             })
     }
     const downloadFile = async (path, filename) => {
-        ToastAndroid.show("Downloading file " + filename, ToastAndroid.SHORT)
+        setShowDownloadPopup(true)
+        setDownloadProcess(0)
 
         let uri = "https://c6.kemono.su/data" + path + "?f=" + filename
         console.log(uri)
@@ -50,15 +54,39 @@ export default function () {
         let downloadObject = FileSystem.createDownloadResumable(
             uri,
             targetLocation,
-            {},
-            // process => console.log(process.totalBytesExpectedToWrite)
+            {cache: true},
+            process => {
+                const percentProgress = process.totalBytesWritten / process.totalBytesExpectedToWrite
+                setDownloadProcess(percentProgress)
+            }
         )
 
         try {
-            await downloadObject.downloadAsync()
-            Alert.alert("Success", `File ${filename} download succeed\nSaved to: ${targetLocation}`)
+            // Alert.alert("Downloading", downloadProcess)
+            const result = await downloadObject.downloadAsync()
+            saveFile(result.uri, filename, result.headers["content-type"])
         } catch (e) {
             Alert.alert("Fail", `File ${filename} download failed, error:\n${e}`)
+        }
+    }
+    const saveFile = async (uri, filename, type) => {
+        if (Platform.OS === "android") {
+            const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync()
+
+            if (permissions.granted){
+                const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 })
+
+                await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, filename, type)
+                    .then(async (uri) => {
+                        await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 })
+                        Alert.alert("Success", `File ${filename} download succeed\nSaved to: ${uri}`)
+                    })
+                    .catch(error => {
+                        Alert.alert("Fail", `File ${filename} download failed, error:\n${error}`)
+                        console.log(error)
+                    })
+                setShowDownloadPopup(false)
+            }
         }
     }
 
@@ -70,7 +98,17 @@ export default function () {
                     source={{uri: "https://img.kemono.su/icons/"+artistData["service"]+"/"+artistData["id"]}}
                 />
                 <Block style={styles.artistInfoBlockData}>
-                    <Text style={styles.artistInfoBlockName}>{artistData["name"]}</Text>
+                    <Pressable onPress={() => {
+                        navigation.navigate(
+                            'ArtistDetailScreen',
+                            {
+                                artistId: artistData["id"],
+                                service: artistData["service"]
+                            }
+                        )
+                    }}>
+                        <Text style={styles.artistInfoBlockName}>{artistData["name"]}</Text>
+                    </Pressable>
                 </Block>
             </Block>
             <Image
@@ -100,10 +138,12 @@ export default function () {
 
         let Images = postData["attachments"].map((attachment) => {
             if (isFileImage(attachment["name"])){
-                return <AutoAdjustHeightImage
-                    styles={styles.postContentFileImage}
-                    uri={`https://img.kemono.su/thumbnail/data/${attachment["path"]}`}
-                />
+                return <Pressable onPress={() => setDetailImageUri(`https://c5.kemono.su/data${attachment["path"]}?f=${attachment["name"]}`)}>
+                    <AutoAdjustHeightImage
+                        styles={styles.postContentFileImage}
+                        uri={`https://img.kemono.su/thumbnail/data/${attachment["path"]}`}
+                    />
+                </Pressable>
             }
         })
 
@@ -148,6 +188,29 @@ export default function () {
             <PostContentAttachmentsImages />
         </Block>
     }
+    const DownloadPopup = () => {
+        return <Block style={styles.DownloadPopupMask}>
+            <Block style={styles.DownloadPopupBlock}>
+                <Text style={styles.DownloadPopupTitle}>Download File</Text>
+                <Slider
+                    maximumValue={100}
+                    value={Math.ceil(downloadProcess*100)}
+                    thumbStyle={{
+                        display: "none"
+                    }}
+                    trackStyle={{
+                        alignSelf: "center",
+                        width: "90%"
+                    }}
+                    disabled
+                />
+                <Text style={styles.DownloadPopupText}>{"Progress: " + Math.ceil(downloadProcess*100) + "%"}</Text>
+                <Button style={styles.DownloadPopupBtn} onPress={() => setShowDownloadPopup(false)}>
+                    Close
+                </Button>
+            </Block>
+        </Block>
+    }
 
     useEffect(() => {
         getPostDetail()
@@ -156,8 +219,13 @@ export default function () {
         console.log("getting artist data")
         getArtistData()
     }, [artistId, service]);
+    useEffect(() => {
+        console.log(detailImageUri)
+    },[detailImageUri])
 
     return <SafeAreaView style={GlobalStyles.container}>
+        {detailImageUri !== "" && <HDImageViewerPopup uri={detailImageUri} onClose={() => {setDetailImageUri("")}} />}
+        {showDownloadPopup && <DownloadPopup />}
         <ScrollView>
             <CreaterInfo />
             <PostInfo />

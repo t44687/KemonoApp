@@ -119,5 +119,42 @@ export default StyleSheet.create({
     postContentFileDownloadsText: {
         padding: 5,
         color: "#7db2e8"
+    },
+
+    DownloadPopupBlock: {
+        width: "70%",
+        aspectRatio: 1,
+        alignSelf: "center",
+        top: "30%",
+        backgroundColor: "#282a2e",
+        borderColor: "#737373",
+        borderStyle: "solid",
+        borderRadius: 5,
+        borderWidth: 1
+    },
+    DownloadPopupMask: {
+        position: "absolute",
+        zIndex: 2,
+        marginLeft: "auto",
+        marginRight: "auto",
+        width: "100%",
+        height: "100%",
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    },
+    DownloadPopupTitle: {
+        color: "#f2f2f2",
+        fontSize: 24,
+        textAlign: "center",
+        marginTop: 10,
+        marginBottom: 10
+    },
+    DownloadPopupText: {
+        color: "#f2f2f2",
+        fontSize: 16,
+        textAlign: "center",
+    },
+    DownloadPopupBtn: {
+        alignSelf: "center",
+        marginTop: 50
     }
 });
