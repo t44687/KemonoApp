@@ -9,6 +9,7 @@ import AutoAdjustHeightImage from "../../Component/AutoAdjustHeightImage";
 import * as FileSystem from "expo-file-system"
 import HDImageViewerPopup from "../../Component/HDImageViewerPopup";
 import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
+import CustomProgress from "../../Component/CustomProgress";
 
 export default function () {
     const [postData, setPostData] = useState({})
@@ -197,19 +198,7 @@ export default function () {
         return <Block style={styles.DownloadPopupMask}>
             <Block style={styles.DownloadPopupBlock}>
                 <Text style={styles.DownloadPopupTitle}>Download File</Text>
-                <Slider
-                    maximumValue={100}
-                    value={Math.ceil(downloadProcess*100)}
-                    thumbStyle={{
-                        display: "none"
-                    }}
-                    trackStyle={{
-                        alignSelf: "center",
-                        width: "90%"
-                    }}
-                    disabled
-                />
-                <Text style={styles.DownloadPopupText}>{"Progress: " + Math.ceil(downloadProcess*100) + "%"}</Text>
+                <CustomProgress loadProgress={downloadProcess} />
                 <Button style={styles.DownloadPopupBtn} onPress={() => setShowDownloadPopup(false)}>
                     Close
                 </Button>

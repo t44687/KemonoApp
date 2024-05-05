@@ -8,14 +8,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: "100%",
         height: "100%",
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
     },
     horizontal: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         padding: 10,
     },
-
+    Mask: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    },
     indicator: {
         position: 'absolute',
         zIndex: 10,
@@ -29,8 +30,13 @@ const styles = StyleSheet.create({
 });
 
 
-export default function ({size='large', color}){
-    return <View style={[styles.container, styles.horizontal]}>
+export default function ({enableMask=true, size='large', color}){
+    let styleList = [styles.container, styles.horizontal]
+    if (enableMask){
+        styleList.push(styles.Mask)
+    }
+
+    return <View style={styleList}>
         <ActivityIndicator
             size={size}
             color={color}

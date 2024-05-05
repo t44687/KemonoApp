@@ -154,7 +154,8 @@ export default StyleSheet.create({
         textAlign: "center",
     },
     DownloadPopupBtn: {
+        position: "absolute",
         alignSelf: "center",
-        marginTop: 50
+        bottom: 10
     }
 });
