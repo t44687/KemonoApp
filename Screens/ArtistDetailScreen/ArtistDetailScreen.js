@@ -5,11 +5,13 @@ import {Alert, FlatList, Image, View} from "react-native";
 import GlobalStyles from "../../Style/GlobalStyles";
 import styles from "./Styles/ArtistDetailScreenStyles"
 import PostCard from "../../Component/PostCard";
+import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 
 export default function (){
     const [artistData, setArtistData] = useState({})
     const [postList, setPostList] = useState([])
     const [startIndex, setStartIndex] = useState(0)
+    const [isLoading, setIsLoading] = useState(true)
 
     const navigation = useNavigation()
     const route = useRoute()
@@ -27,7 +29,10 @@ export default function (){
         console.log("getting posts")
         return fetch(`https://kemono.su/api/v1/${service}/user/${artistId}?o=${startIndex}`)
             .then(response => response.json())
-            .then(json => setPostList(json))
+            .then(json => {
+                setIsLoading(false)
+                setPostList(json)
+            })
             .catch(error => {
                 console.error(error)
             })
@@ -126,6 +131,7 @@ export default function (){
 
     return (
         <View style={GlobalStyles.container}>
+            {isLoading && <CustomActivityIndicator />}
             <FlatList
                 style={styles.container}
                 data={postList}

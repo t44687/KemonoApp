@@ -1,5 +1,5 @@
 import GlobalStyles from "../../Style/GlobalStyles";
-import {Alert, Image, Platform, Pressable, SafeAreaView, ScrollView, ToastAndroid, View} from "react-native";
+import {Alert, Image, Platform, Pressable, SafeAreaView, ScrollView, ActivityIndicator, View} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
 import {Block, Button, Text, Slider} from "galio-framework";
@@ -8,6 +8,7 @@ import {htmlCodeConvertor} from "../../Component/HtmlCodeConvertor";
 import AutoAdjustHeightImage from "../../Component/AutoAdjustHeightImage";
 import * as FileSystem from "expo-file-system"
 import HDImageViewerPopup from "../../Component/HDImageViewerPopup";
+import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 
 export default function () {
     const [postData, setPostData] = useState({})
@@ -15,6 +16,7 @@ export default function () {
     const [downloadProcess, setDownloadProcess] = useState(0)
     const [showDownloadPopup, setShowDownloadPopup] = useState(false)
     const [detailImageUri, setDetailImageUri] = useState("")
+    const [isLoading, setIsLoading] = useState(true)
 
     const navigation = useNavigation()
     const route = useRoute()
@@ -31,7 +33,10 @@ export default function () {
     const getPostDetail = () => {
         return fetch(`https://kemono.su/api/v1/${service}/user/${artistId}/post/${postId}`)
             .then(response => response.json())
-            .then(json => setPostData(json))
+            .then(json => {
+                setPostData(json)
+                setIsLoading(false)
+            })
             .catch(error => {
                 console.error(error)
             })
@@ -122,8 +127,8 @@ export default function () {
     const PostInfo = () => {
         return <Block style={styles.postInfoBlock}>
             <Text style={styles.postInfoBlockPostName}>{postData["title"]} + ({postData["service"]})</Text>
-            <Text style={styles.postInfoBlockPostPublished}>Published:    {postData["published"] !== undefined ? postData["published"].replace("T", " ") : ""}</Text>
-            <Text style={styles.postInfoBlockPostEdited}>Edited:       {postData["edited"] !== undefined ? postData["edited"].replace("T", " ") : ""}</Text>
+            <Text style={styles.postInfoBlockPostPublished}>Published:    {postData["published"] !== undefined && postData["published"] !== null ? postData["published"].replace("T", " ") : ""}</Text>
+            <Text style={styles.postInfoBlockPostEdited}>Edited:       {postData["edited"] !== undefined && postData["edited"] !== null ? postData["edited"].replace("T", " ") : ""}</Text>
             <Block style={styles.postInfoBlockPostBtnGroup}>
                 <Button>Flagged</Button>
                 <Button>Favorite</Button>
@@ -224,12 +229,13 @@ export default function () {
     },[detailImageUri])
 
     return <SafeAreaView style={GlobalStyles.container}>
+        {isLoading && <CustomActivityIndicator />}
         {detailImageUri !== "" && <HDImageViewerPopup uri={detailImageUri} onClose={() => {setDetailImageUri("")}} />}
         {showDownloadPopup && <DownloadPopup />}
         <ScrollView>
             <CreaterInfo />
-            <PostInfo />
-            <PostContent />
+            {!isLoading && <PostInfo />}
+            {!isLoading && <PostContent />}
         </ScrollView>
     </SafeAreaView>
 }
