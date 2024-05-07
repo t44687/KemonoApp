@@ -55,7 +55,8 @@ export default function Pagination({currentPage, total, maxPageShown, onPageChan
         return currentPage > 1
     }
     const haveNextPage = () => {
-        return currentPage !== Math.ceil(total/50)
+        const remainPages = Math.ceil(total/50)
+        return currentPage !== remainPages && remainPages > 0
     }
 
     const generatePageList = () => {
@@ -65,7 +66,7 @@ export default function Pagination({currentPage, total, maxPageShown, onPageChan
         )
 
         let iteration = 1
-        while (tempList.length < maxPageShown){
+        while (tempList.length < maxPageShown && haveNextPage()){
             if (havePreviousPage() && currentPage-iteration > 0){
                 tempList.unshift(
                     {page: currentPage-iteration}

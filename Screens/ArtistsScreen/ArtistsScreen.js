@@ -6,26 +6,32 @@ import {Card, Text} from "galio-framework";
 import styles from "./Styles/ArtistsScreenStyles"
 import Pagination from "../../Component/Pagination";
 import ArtistCard from "../../Component/ArtistCard"
+import ArtistsSearchForm from "./Components/ArtistsSearchForm";
 
 export default function ArtistsScreen({ navigation, route }){
-    const [creaters, setCreaters] = useState([])
+    const cachedCreators = require('../../assets/Cache/creators.json')
+
+    const [creators, setCreators] = useState(cachedCreators)
+    const [filteredCreators, setFilteredCreators] = useState([])
     const [useCache, setUseCache] = useState(true)
     const [startIndex, setStartIndex] = useState(0)
 
-    const cachedCreators = require('../../assets/Cache/creators.json')
+    const [queryCreator, setQueryCreator] = useState({
+        "name": ""
+    })
 
-    const setCreatersWithFilters = (loadedCreaters) => {
-        let sortedCreaters = loadedCreaters.sort((a,b) => b.favorited - a.favorited)
-        setCreaters(sortedCreaters)
+    const setCreatersWithFilters = () => {
+        let temp = creators.filter((creator) => creator['name'].toLowerCase().includes(queryCreator.name.toLowerCase()))
+        temp = temp.sort((a,b) => b.favorited - a.favorited)
+        setFilteredCreators(temp)
+        setStartIndex(0)
     }
 
     const getCreators = () => {
-        console.log("get creators")
-
         return fetch('https://kemono.su/api/v1/creators')
             .then(response => response.json())
             .then(json => {
-                setCreatersWithFilters(json)
+                setCreators(json)
                 setUseCache(false)
             })
             .catch(error => {
@@ -41,8 +47,8 @@ export default function ArtistsScreen({ navigation, route }){
     }
     const getEndIndex = () => {
         let endIndex = startIndex + 50
-        if (endIndex > creaters.length){
-            endIndex = creaters.length
+        if (endIndex > filteredCreators.length){
+            endIndex = filteredCreators.length
         }
         return endIndex
     }
@@ -55,6 +61,10 @@ export default function ArtistsScreen({ navigation, route }){
     }
 
     const createArtistCard = (artist) => {
+
+        if (artist.item === undefined){
+            return null
+        }
 
         return (
             <ArtistCard
@@ -78,7 +88,7 @@ export default function ArtistsScreen({ navigation, route }){
         if (useCache){
             indexMsg = "Using cache for now, please wait"
         }else{
-            indexMsg = "Showing "+(startIndex+1)+" - "+getEndIndex()+" of "+creaters.length
+            indexMsg = "Showing "+(startIndex+1)+" - "+getEndIndex()+" of "+filteredCreators.length
         }
 
         return <Text style={{"color":"#fff"}}>
@@ -86,22 +96,40 @@ export default function ArtistsScreen({ navigation, route }){
         </Text>
     }
 
-    const generateArtistsCard = () => {
-        let endIndex = getEndIndex()
+    const OnFilterChange = (key, value) => {
+        setQueryCreator(prevState => {
+            return {
+                ...prevState,
+                [key]: value
+            }
+        })
+    }
 
+    const generateArtistsCard = () => {
+        console.log("start generating artist cards")
+
+        // let filteredCreators = creators.filter((creator) => creator['name'].includes(queryCreator.name))
         let artistsCards = []
+
+        let endIndex = Math.min(getEndIndex(), filteredCreators.length-1)
         for (let i = startIndex; i < endIndex; i++){
-            artistsCards.push(creaters[i])
+            artistsCards.push(filteredCreators[i])
         }
 
         return <FlatList
             style={styles.container}
             data={artistsCards}
             renderItem={createArtistCard}
+            ListHeaderComponent={
+                <ArtistsSearchForm
+                    name={queryCreator.name}
+                    onNameChange={(name) => OnFilterChange("name", name)}
+                />
+            }
             ListFooterComponent={
                 <Pagination
                     currentPage={(startIndex / 50)+1}
-                    total={creaters.length}
+                    total={filteredCreators.length}
                     maxPageShown={5}
                     onPageChange={(pageIndex) => onPageChange(pageIndex)}
                 />
@@ -110,10 +138,14 @@ export default function ArtistsScreen({ navigation, route }){
     }
 
     useEffect(() => {
-        setCreatersWithFilters(cachedCreators)
         getStartIndex()
         getCreators()
     }, []);
+    useEffect(() => {
+        if (creators.length >= 0){
+            setCreatersWithFilters()
+        }
+    }, [queryCreator]);
 
     return (
         <View style={GlobalStyles.container}>

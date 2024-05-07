@@ -35,7 +35,6 @@ const HDImageViewerPopup = ({uri, styles, onClose}) => {
     })
 
     useEffect(() => {
-        console.log("123")
         Image.getSize(uri, (width, height) => {
             setAspectRatio(width / height);
         });

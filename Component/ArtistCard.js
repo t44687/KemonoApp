@@ -10,7 +10,7 @@ class ArtistCard extends PureComponent {
         const {id, name, favorited, service, onClick} = this.props
 
         return (
-            <Pressable onPress={() => onClick(id, service)}>
+            <Pressable key={id} onPress={() => onClick(id, service)}>
                 <Card
                     flex
                     style={styles.card}
@@ -27,6 +27,7 @@ class ArtistCard extends PureComponent {
 
 export default function ({id, name, favorited, service, onClick}){
     return <ArtistCard
+        key={id}
         id={id}
         name={name}
         favorited={favorited}
