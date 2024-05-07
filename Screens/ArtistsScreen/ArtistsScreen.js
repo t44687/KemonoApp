@@ -17,11 +17,20 @@ export default function ArtistsScreen({ navigation, route }){
     const [startIndex, setStartIndex] = useState(0)
 
     const [queryCreator, setQueryCreator] = useState({
-        "name": ""
+        "name": "",
+        "service": ""
     })
 
     const setCreatersWithFilters = () => {
-        let temp = creators.filter((creator) => creator['name'].toLowerCase().includes(queryCreator.name.toLowerCase()))
+        let temp = []
+        if (queryCreator.name === ""){
+            temp = creators // skip name filtering
+        }else {
+            temp = creators.filter((creator) => creator['name'].toLowerCase().includes(queryCreator.name.toLowerCase()))
+        }
+        if (queryCreator.service !== ""){
+            temp = temp.filter((creator) => creator['service'].toLowerCase() === queryCreator.service)
+        }
         temp = temp.sort((a,b) => b.favorited - a.favorited)
         setFilteredCreators(temp)
         setStartIndex(0)
@@ -123,7 +132,9 @@ export default function ArtistsScreen({ navigation, route }){
             ListHeaderComponent={
                 <ArtistsSearchForm
                     name={queryCreator.name}
+                    service={queryCreator.service}
                     onNameChange={(name) => OnFilterChange("name", name)}
+                    onServiceChange={(serviceName) => OnFilterChange("service", serviceName)}
                 />
             }
             ListFooterComponent={
