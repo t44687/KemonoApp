@@ -4,8 +4,11 @@ import {Card} from "galio-framework";
 import styles from "./Styles/PostsScreenStyles"
 import GlobalStyles from "../../Style/GlobalStyles";
 import PostCard from "../../Component/PostCard";
+import {useNavigation} from "@react-navigation/native";
 
 export default function PostsScreen() {
+    const navigation = useNavigation()
+    
     const [posts, setPosts] = useState()
 
     const getPosts = () => {
@@ -25,7 +28,14 @@ export default function PostsScreen() {
                 service={post.item.service}
                 user={post.item.user}
                 filePath={post.item.file.path}
-                onClick={(id) => Alert.alert('test', id)}
+                onClick={(id) => navigation.navigate(
+                    'PostDetailScreen',
+                    {
+                        postId: id,
+                        artistId: post.item.user,
+                        service: post.item.service
+                    }
+                )}
             />
         )
     }
