@@ -21,7 +21,7 @@ const navBarData = [
     {navigate: 'Artists', text: 'Artists'},
     {navigate: 'Posts', text: 'Posts'},
     {navigate: '4', text: 'Import'},
-    {navigate: '5', text: 'Favorites'},
+    {navigate: 'FavoriteScreen', text: 'Favorites'},
     {navigate: 'Login', text: 'Login'},
 ]
 

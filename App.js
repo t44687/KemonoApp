@@ -10,6 +10,7 @@ import PostsScreen from "./Screens/PostsScreen/PostsScreen";
 import ArtistDetailScreen from "./Screens/ArtistDetailScreen/ArtistDetailScreen";
 import PostDetailScreen from "./Screens/PostDetailScreen/PostDetailScreen";
 import LoginScreen from "./Screens/LoginScreen/LoginScreen";
+import FavoriteScreen from "./Screens/FavoriteScreen/FavoriteScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -80,6 +81,19 @@ export default function App() {
               <Stack.Screen
                   name="PostDetailScreen"
                   component={PostDetailScreen}
+                  options={{
+                      unmountOnBlur: true,
+                      drawerItemStyle: { display: 'none' }, // hidden it in slide menu
+                      headerStyle: {
+                          backgroundColor: '#282a2e',
+                      },
+                      headerTitle: (props) =>
+                          <KemonoNavBar />
+                  }}
+              />
+              <Stack.Screen
+                  name="FavoriteScreen"
+                  component={FavoriteScreen}
                   options={{
                       unmountOnBlur: true,
                       drawerItemStyle: { display: 'none' }, // hidden it in slide menu
