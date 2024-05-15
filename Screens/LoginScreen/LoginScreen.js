@@ -3,9 +3,8 @@ import {StyleSheet} from "react-native";
 import {Block, Button, Input, Text} from "galio-framework";
 import globalStyles from "../../Style/GlobalStyles";
 import GlobalStyles from "../../Style/GlobalStyles";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useNavigation} from "@react-navigation/native";
 
 const styles = StyleSheet.create({
@@ -35,30 +34,15 @@ export default function LoginScreen() {
     
     const [username, setUsername] = useState()
     const [password, setPassword] = useState()
-    const [session, setSession] = useState("")
     const [isLoading, setIsLoading] = useState(false)
 
     const getSession = function(headers) {
         for (const [name, value] of headers) {
-            console.log(name)
-            if (name === "session") {
-                console.log(value)
+            if (name === "age" && value > 0) {
+                navigation.navigate("Artists")
                 break
             }
         }
-    }
-    const saveSession = async () => {
-        setIsLoading(true)
-        try {
-            await AsyncStorage.setItem(
-                'session',
-                session,
-            );
-            navigation.navigate("Artists")
-        } catch (error) {
-            console.log(error)
-        }
-        setIsLoading(false)
     }
     const login = () => {
         setIsLoading(true)
@@ -78,6 +62,10 @@ export default function LoginScreen() {
             .then(() => setIsLoading(false))
             .catch((e) => console.log(e))
     }
+
+    useEffect(() => {
+        login() // try login (can't check httpOnly cookie)
+    }, []);
     
     return (
         <Block style={globalStyles.container}>
@@ -87,36 +75,25 @@ export default function LoginScreen() {
             <Text style={[GlobalStyles.text]}>Your favorites will automatically be saved</Text>
             
             <Block style={styles.LoginForm}>
-                {/*<Input*/}
-                {/*    borderless*/}
-                {/*    style={styles.FormInput}*/}
-                {/*    placeholder={"Username"}*/}
-                {/*    value={username}*/}
-                {/*    onChangeText={text => setUsername(text)}*/}
-                {/*/>*/}
-                {/*<Input*/}
-                {/*    borderless*/}
-                {/*    style={styles.FormInput}*/}
-                {/*    placeholder={"Password"}*/}
-                {/*    value={password}*/}
-                {/*    onChangeText={text => setPassword(text)}*/}
-                {/*    password={true}*/}
-                {/*/>*/}
                 <Input
                     borderless
                     style={styles.FormInput}
-                    placeholder={"Session"}
-                    value={session}
-                    onChangeText={text => setSession(text)}
+                    placeholder={"Username"}
+                    value={username}
+                    onChangeText={text => setUsername(text)}
                 />
-                {/*<Button */}
-                {/*    style={styles.FormButton} */}
-                {/*    onPress={login}*/}
-                {/*>Login</Button>*/}
+                <Input
+                    borderless
+                    style={styles.FormInput}
+                    placeholder={"Password"}
+                    value={password}
+                    onChangeText={text => setPassword(text)}
+                    password={true}
+                />
                 <Button 
                     style={styles.FormButton} 
-                    onPress={saveSession}
-                >Save Session</Button>
+                    onPress={login}
+                >Login</Button>
             </Block>
         </Block>
     )
