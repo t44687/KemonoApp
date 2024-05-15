@@ -6,7 +6,7 @@ export default function ({
     name, onNameChange,
     service, onServiceChange,
     sortBy, onSortByChange,
-    sort, onSortChange
+    order, onOrderChange
                          }){
 
     const styles = StyleSheet.create({
@@ -21,9 +21,6 @@ export default function ({
             padding: 10,
             backgroundColor: "#282a2e"
         },
-        FormRow: {
-            flexDirection: "row",
-        },
         FormInput: {
             backgroundColor: "#f2f2f2",
             borderRadius: 7,
@@ -33,7 +30,8 @@ export default function ({
             backgroundColor: "#f2f2f2",
             borderRadius: 7,
             height: 40,
-            padding: 15
+            padding: 15,
+            marginBottom: 10
         },
         FormDropdownText: {
             color: "#282a2e",
@@ -52,6 +50,17 @@ export default function ({
         { label: 'Gumroad', value: 'gumroad'},
         { label: 'SubscribeStar', value: 'subscribestar'},
     ];
+    const sortByList = [
+        { label: 'Popularity', value: 'favorited'},
+        { label: 'Date Indexed', value: 'indexed'},
+        { label: 'Date Updated', value: 'updated'},
+        { label: 'Alphabetical Order', value: 'name'},
+        { label: 'Service', value: 'service'},
+    ]
+    const orderList = [
+        { label: 'Descending', value: 0},
+        { label: 'Ascending', value: 1}
+    ]
 
     return (
         <Block style={styles.Container}>
@@ -73,6 +82,30 @@ export default function ({
                     value={service}
                     onChange={item => {
                         onServiceChange(item.value)
+                    }}
+                />
+                <Dropdown
+                    style={styles.FormDropdown}
+                    data={sortByList}
+                    placeholderStyle={styles.FormDropdownText}
+                    placeholder={'Sort by'}
+                    labelField='label'
+                    valueField='value'
+                    value={sortBy}
+                    onChange={item => {
+                        onSortByChange(item.value)
+                    }}
+                />
+                <Dropdown
+                    style={styles.FormDropdown}
+                    data={orderList}
+                    placeholderStyle={styles.FormDropdownText}
+                    placeholder={'Order'}
+                    labelField='label'
+                    valueField='value'
+                    value={order}
+                    onChange={item => {
+                        onOrderChange(item.value)
                     }}
                 />
             </Block>
