@@ -22,7 +22,7 @@ const navBarData = [
     {navigate: 'Posts', text: 'Posts'},
     {navigate: '4', text: 'Import'},
     {navigate: '5', text: 'Favorites'},
-    {navigate: '6', text: 'Logout'},
+    {navigate: 'Login', text: 'Login'},
 ]
 
 const NavbarRenderItem = ({item, navigation}) => {

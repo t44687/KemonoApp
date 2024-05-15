@@ -9,9 +9,9 @@ import ArtistsScreen from "./Screens/ArtistsScreen/ArtistsScreen";
 import PostsScreen from "./Screens/PostsScreen/PostsScreen";
 import ArtistDetailScreen from "./Screens/ArtistDetailScreen/ArtistDetailScreen";
 import PostDetailScreen from "./Screens/PostDetailScreen/PostDetailScreen";
+import LoginScreen from "./Screens/LoginScreen/LoginScreen";
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
 
 
@@ -22,6 +22,17 @@ export default function App() {
               <Stack.Screen
                   name="Home"
                   component={HomeScreen}
+                  options={{
+                      headerStyle: {
+                          backgroundColor: '#282a2e',
+                      },
+                      headerTitle: (props) =>
+                          <KemonoNavBar />
+                  }}
+              />
+              <Stack.Screen
+                  name="Login"
+                  component={LoginScreen}
                   options={{
                       headerStyle: {
                           backgroundColor: '#282a2e',
