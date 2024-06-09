@@ -37,10 +37,9 @@ const NavbarRenderItem = ({item, navigation}) => {
 
 const NavBarContent = ({navigation}) => {
     const navBarData = [
-        {navigate: 'Home', text: 'Home'},
         {navigate: 'Artists', text: 'Artists'},
         {navigate: 'Posts', text: 'Posts'},
-        {navigate: '4', text: 'Import'},
+        // {navigate: '4', text: 'Import'},
         getLoginState() && {navigate: 'FavoriteScreen', text: 'Favorites'},
         getLoginState() ?
             {navigate: 'Login', text: 'Logout'} :

@@ -18,17 +18,11 @@ const Stack = createNativeStackNavigator();
 
 function Navigation(props) {
     return <NavigationContainer>
-        <Stack.Navigator>
-            <Stack.Screen
-                name="Home"
-                component={HomeScreen}
-                options={{
-                    headerStyle: {
-                        backgroundColor: "#282a2e",
-                    },
-                    headerTitle: props.headerTitle
-                }}
-            />
+        <Stack.Navigator
+            screenOptions={{
+                headerBackVisible: false,
+            }}
+        >
             <Stack.Screen
                 name="Login"
                 component={LoginScreen}
@@ -36,7 +30,7 @@ function Navigation(props) {
                     headerStyle: {
                         backgroundColor: "#282a2e",
                     },
-                    headerTitle: props.headerTitle
+                    headerTitle: props.headerTitle,
                 }}
             />
             <Stack.Screen
