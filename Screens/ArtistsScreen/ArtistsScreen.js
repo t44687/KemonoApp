@@ -148,7 +148,6 @@ export default function ArtistsScreen({ navigation, route }){
                     onOrderChange={(value) => OnFilterChange("order", value)}
                 />
             }
-            ListEmptyComponent={<CustomActivityIndicator />}
             ListFooterComponent={
                 <Pagination
                     currentPage={(startIndex / 50)+1}

@@ -25,6 +25,7 @@ export default function FavoriteScreen() {
     const [favoritePosts, setFavoritePosts] = useState([])
     const [startIndex, setStartIndex] = useState(0)
     const [type, setType] = useState("artist")
+    const [isLoading, setIsLoading] = useState(true)
     const [filter, setFilter] = useState({
         "sortBy": "updated_timestamp",
         "order": 0
@@ -47,9 +48,15 @@ export default function FavoriteScreen() {
                     return e
                 })
                 setFavoriteArtists(json)
+                if (favoritePosts.length > 0){
+                    setIsLoading(false)
+                }
             })
             .catch(error => {
                 console.error(error)
+                if (favoritePosts.length > 0){
+                    setIsLoading(false)
+                }
             })
     }
     const getFavoritePosts = () => {
@@ -68,9 +75,15 @@ export default function FavoriteScreen() {
                     return e
                 })
                 setFavoritePosts(json)
+                if (favoriteArtists.length > 0){
+                    setIsLoading(false)
+                }
             })
             .catch(error => {
                 console.error(error)
+                if (favoriteArtists.length > 0){
+                    setIsLoading(false)
+                }
             })
     }
 
@@ -177,7 +190,6 @@ export default function FavoriteScreen() {
                     onOrderChange={(value) => OnFilterChange("order", value)}
                 />
             }
-            ListEmptyComponent={<CustomActivityIndicator />}
             ListFooterComponent={
                 <Pagination
                     currentPage={(startIndex / 50)+1}
@@ -204,6 +216,7 @@ export default function FavoriteScreen() {
     
     return (
         <Block  style={globalStyles.container}>
+            {!isLoading && <CustomActivityIndicator />}
             <Text style={[GlobalStyles.text, styles.Title]}>Favorite</Text>
             <GenerateArtistsCard 
                 dataList={type === "artist" ? favoriteArtists : favoritePosts}
