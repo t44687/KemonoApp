@@ -1,13 +1,11 @@
-import {Block, Input, Accordion} from "galio-framework";
 import {StyleSheet} from "react-native";
+import {Block, Input} from "galio-framework";
 import {Dropdown} from "react-native-element-dropdown";
 
 export default function ({
-    name, onNameChange,
-    service, onServiceChange,
+    type, onTypeChange,
     sortBy, onSortByChange,
-    order, onOrderChange
-                         }){
+    order, onOrderChange}) {
 
     const styles = StyleSheet.create({
         Container: {
@@ -37,25 +35,19 @@ export default function ({
             color: "#282a2e",
         }
     })
-
-    const serviceList = [
-        { label: 'All', value: ''},
-        { label: 'Patreon', value: 'patreon'},
-        { label: 'Pixiv Fanbox', value: 'fanbox'},
-        { label: 'Discord', value: 'discord'},
-        { label: 'Fantia', value: 'fantia'},
-        { label: 'Afdian', value: 'afdian'},
-        { label: 'Boosty', value: 'boosty'},
-        { label: 'DLsite', value: 'dlsite'},
-        { label: 'Gumroad', value: 'gumroad'},
-        { label: 'SubscribeStar', value: 'subscribestar'},
-    ];
-    const sortByList = [
-        { label: 'Popularity', value: 'favorited'},
-        { label: 'Date Indexed', value: 'indexed'},
-        { label: 'Date Updated', value: 'updated'},
-        { label: 'Alphabetical Order', value: 'name'},
-        { label: 'Service', value: 'service'},
+    
+    const typeList = [
+        { label: 'Artists', value: 'artist'},
+        { label: 'Posts', value: 'post'},
+    ]
+    const artistsSortByList = [
+        { label: 'New post date', value: 'updated_timestamp'},
+        { label: 'Faved date', value: 'faved_seq'},
+        { label: 'Reimported date', value: 'last_imported_timestamp'}
+    ]
+    const postsSortByList = [
+        { label: 'Faved date', value: 'faved_seq'},
+        { label: 'Published', value: 'published_timestamp'}
     ]
     const orderList = [
         { label: 'Descending', value: 0},
@@ -65,28 +57,21 @@ export default function ({
     return (
         <Block style={styles.Container}>
             <Block style={styles.Form}>
-                <Input
-                    borderless
-                    style={styles.FormInput}
-                    placeholder={"Name"}
-                    value={name}
-                    onChangeText={text => onNameChange(text)}
-                />
                 <Dropdown
                     style={styles.FormDropdown}
-                    data={serviceList}
+                    data={typeList}
                     placeholderStyle={styles.FormDropdownText}
-                    placeholder={'Service'}
-                    labelField="label"
-                    valueField="value"
-                    value={service}
+                    placeholder={'Type'}
+                    labelField='label'
+                    valueField='value'
+                    value={type}
                     onChange={item => {
-                        onServiceChange(item.value)
+                        onTypeChange(item.value)
                     }}
                 />
                 <Dropdown
                     style={styles.FormDropdown}
-                    data={sortByList}
+                    data={type === "artist" ? artistsSortByList : postsSortByList}
                     placeholderStyle={styles.FormDropdownText}
                     placeholder={'Sort by'}
                     labelField='label'

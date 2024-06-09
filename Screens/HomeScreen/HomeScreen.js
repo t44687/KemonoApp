@@ -4,11 +4,12 @@ import GlobalStyles from "../../Style/GlobalStyles";
 import {log} from "expo/build/devtools/logger";
 
 export default function HomeScreen({navigation}){
+    
     return (
         <View style={GlobalStyles.container}>
             <Text style={GlobalStyles.text}>Welcome to Kemono App</Text>
             <Button
-                onPress={() => Alert.alert('Test','Login')}
+                onPress={() => navigation.navigate("Login")}
             >Login</Button>
         </View>
     )

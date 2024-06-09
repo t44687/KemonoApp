@@ -7,6 +7,7 @@ import styles from "./Styles/ArtistsScreenStyles"
 import Pagination from "../../Component/Pagination";
 import ArtistCard from "../../Component/ArtistCard"
 import ArtistsSearchForm from "./Components/ArtistsSearchForm";
+import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 
 export default function ArtistsScreen({ navigation, route }){
     const cachedCreators = require('../../assets/Cache/creators.json')
@@ -18,7 +19,9 @@ export default function ArtistsScreen({ navigation, route }){
 
     const [queryCreator, setQueryCreator] = useState({
         "name": "",
-        "service": ""
+        "service": "",
+        "sortBy": "favorited",
+        "order": 0,
     })
 
     const setCreatersWithFilters = () => {
@@ -31,7 +34,11 @@ export default function ArtistsScreen({ navigation, route }){
         if (queryCreator.service !== ""){
             temp = temp.filter((creator) => creator['service'].toLowerCase() === queryCreator.service)
         }
-        temp = temp.sort((a,b) => b.favorited - a.favorited)
+        if (queryCreator.order){
+            temp = temp.sort((a,b) => a[queryCreator.sortBy] - b[queryCreator.sortBy])
+        }else{
+            temp = temp.sort((a,b) => b[queryCreator.sortBy] - a[queryCreator.sortBy])
+        }
         setFilteredCreators(temp)
         setStartIndex(0)
     }
@@ -133,8 +140,12 @@ export default function ArtistsScreen({ navigation, route }){
                 <ArtistsSearchForm
                     name={queryCreator.name}
                     service={queryCreator.service}
+                    sortBy={queryCreator.sortBy}
+                    order={queryCreator.order}
                     onNameChange={(name) => OnFilterChange("name", name)}
                     onServiceChange={(serviceName) => OnFilterChange("service", serviceName)}
+                    onSortByChange={(value) => OnFilterChange("sortBy", value)}
+                    onOrderChange={(value) => OnFilterChange("order", value)}
                 />
             }
             ListFooterComponent={
