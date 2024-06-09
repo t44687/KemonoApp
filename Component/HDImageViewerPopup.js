@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Dimensions, Image, Pressable, StyleSheet, useWindowDimensions} from 'react-native';
 import {Block} from "galio-framework";
 import CustomProgress from "./CustomProgress";
+import {VideoFullscreenUpdate} from "expo-av";
+import * as ScreenOrientation from "expo-screen-orientation";
 
 const HDImageViewerPopup = ({uri, styles, onClose}) => {
     const [aspectRatio, setAspectRatio] = useState(1);
@@ -32,16 +34,10 @@ const HDImageViewerPopup = ({uri, styles, onClose}) => {
             justifyContent: 'center',
             alignItems: 'center',
         },
-        ImagePortrait: {
+        Image: {
             width: "100%",
             height: undefined,
             aspectRatio,
-        },
-        ImageLandscape: {
-            width: undefined,
-            height: "100%",
-            aspectRatio,
-            transform: [{rotate: '90deg'}]
         },
         CloseBtn: {
             position: "absolute",
@@ -51,6 +47,16 @@ const HDImageViewerPopup = ({uri, styles, onClose}) => {
         }
     })
 
+    const handleOrientation = async (unlock) => {
+        if (unlock)
+            await ScreenOrientation.unlockAsync()
+        else
+            await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT,)
+    }
+
+    useEffect(() => {
+        handleOrientation(true)
+    }, []);
     useEffect(() => {
         Image.getSize(uri, (width, height) => {
             setAspectRatio(width / height);
@@ -59,15 +65,11 @@ const HDImageViewerPopup = ({uri, styles, onClose}) => {
         });
     }, [uri]);
 
-    const setImageRotation = (aspectRatio) => {
-        if (aspectRatio > 1)
-            return predefinedStyles.ImageLandscape
-        else
-            return predefinedStyles.ImagePortrait
-    }
-
     return (
-        <Pressable style={predefinedStyles.Mask} onPress={() => onClose()}>
+        <Pressable style={predefinedStyles.Mask} onPress={() => {
+            handleOrientation(false)
+            onClose()
+        }}>
             <Block style={predefinedStyles.ImageContainer}>
                 {loadProgress !== 1 &&
                         <CustomProgress
@@ -75,7 +77,7 @@ const HDImageViewerPopup = ({uri, styles, onClose}) => {
                         />
                 }
                 <Image
-                    style={[setImageRotation(aspectRatio), styles]}
+                    style={[predefinedStyles.Image, styles]}
                     source={{ uri: uri }}
                     progressiveRenderingEnabled
                     onLoadStart={() => {

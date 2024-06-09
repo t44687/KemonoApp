@@ -30,14 +30,7 @@ export const AutoAdjustVideoPlayer = ({uri, play}) => {
             height: "100%",
         },
         Video: {
-            backgroundColor: '#000000'
-        },
-        landscapeVideo: {
-            width: "100%",
-            height: undefined,
-            aspectRatio,
-        },
-        portraitVideo: {
+            backgroundColor: '#000000',
             width: "100%",
             height: undefined,
             aspectRatio,
@@ -57,9 +50,8 @@ export const AutoAdjustVideoPlayer = ({uri, play}) => {
             await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT,)
     };
 
-    const adjustSize = (width, height, orientation) => {
+    const adjustSize = (width, height) => {
         setAspectRatio(width / height);
-        setVideoOrientation(orientation)
     }
 
     useEffect(() => {
@@ -74,13 +66,13 @@ export const AutoAdjustVideoPlayer = ({uri, play}) => {
 
     return <Video
         ref={video}
-        style={[predefinedStyles[`${videoOrientation}Video`], predefinedStyles.Video]}
+        style={predefinedStyles.Video}
         useNativeControls
         resizeMode={ResizeMode.CONTAIN}
         isMuted={false}
         shouldPlay={false}
         shouldCorrectPitch={false}
-        onReadyForDisplay={event => adjustSize(event.naturalSize.width, event.naturalSize.height, event.naturalSize.orientation)}
+        onReadyForDisplay={event => adjustSize(event.naturalSize.width, event.naturalSize.height)}
         onFullscreenUpdate={onFullscreenUpdate}
         onError={error => console.error(error)}
     />

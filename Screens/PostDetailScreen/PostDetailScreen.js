@@ -332,7 +332,6 @@ export default function () {
         {isLoading && <CustomActivityIndicator />}
         {detailImageUri !== "" && <HDImageViewerPopup uri={detailImageUri} onClose={() => {setDetailImageUri("")}} />}
         {showDownloadPopup && <DownloadPopup />}
-        {/*<VideoPlayerPopup />*/}
         <ScrollView>
             <CreaterInfo />
             {!isLoading && <PostInfo />}
