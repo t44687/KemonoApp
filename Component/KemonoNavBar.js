@@ -1,6 +1,8 @@
 import {Block, Button, Icon, NavBar, Text, theme} from "galio-framework";
 import {FlatList, Pressable, StyleSheet} from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import {useContext} from "react";
+import {useAuth} from "../Context/AuthContext";
 
 const styles = StyleSheet.create({
     navbar: {
@@ -16,14 +18,10 @@ const styles = StyleSheet.create({
     }
 });
 
-const navBarData = [
-    {navigate: 'Home', text: 'Home'},
-    {navigate: 'Artists', text: 'Artists'},
-    {navigate: 'Posts', text: 'Posts'},
-    {navigate: '4', text: 'Import'},
-    {navigate: 'FavoriteScreen', text: 'Favorites'},
-    {navigate: 'Login', text: 'Login'},
-]
+const getLoginState = () => {
+    const { isAuth, _ } = useAuth()
+    return isAuth
+}
 
 const NavbarRenderItem = ({item, navigation}) => {
     return <Block flex style={styles.navbarItem}>
@@ -36,6 +34,17 @@ const NavbarRenderItem = ({item, navigation}) => {
 }
 
 const NavBarContent = ({navigation}) => {
+    const navBarData = [
+        {navigate: 'Home', text: 'Home'},
+        {navigate: 'Artists', text: 'Artists'},
+        {navigate: 'Posts', text: 'Posts'},
+        {navigate: '4', text: 'Import'},
+        getLoginState() && {navigate: 'FavoriteScreen', text: 'Favorites'},
+        getLoginState() ?
+            {navigate: 'Login', text: 'Logout'} :
+            {navigate: 'Login', text: 'Login'},
+    ]
+
     return <FlatList
         horizontal
         data={navBarData}

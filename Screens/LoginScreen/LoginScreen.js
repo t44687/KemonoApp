@@ -6,6 +6,7 @@ import GlobalStyles from "../../Style/GlobalStyles";
 import {useEffect, useState} from "react";
 import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 import {useNavigation} from "@react-navigation/native";
+import {useAuth} from "../../Context/AuthContext";
 
 const styles = StyleSheet.create({
     Title: {
@@ -31,7 +32,8 @@ const styles = StyleSheet.create({
 
 export default function LoginScreen() {
     const navigation = useNavigation()
-    
+
+    const {isAuth, setIsAuth} = useAuth()
     const [username, setUsername] = useState()
     const [password, setPassword] = useState()
     const [isLoading, setIsLoading] = useState(false)
@@ -59,12 +61,25 @@ export default function LoginScreen() {
             },
             body: formdata
         }).then(response => getSession(response.headers))
-            .then(() => setIsLoading(false))
+            .then(() => {
+                setIsLoading(false)
+                setIsAuth(true)
+            })
             .catch((e) => console.log(e))
     }
 
+    const logout = () => {
+        // TODO call logout api
+        setIsAuth(false)
+    }
+
     useEffect(() => {
-        login() // try login (can't check httpOnly cookie)
+        if (isAuth){ // already logged in, assume want to log out
+            logout()
+        }
+        else{
+            login() // try login (can't check httpOnly cookie)
+        }
     }, []);
     
     return (
