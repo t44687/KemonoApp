@@ -157,5 +157,18 @@ export default StyleSheet.create({
         position: "absolute",
         alignSelf: "center",
         bottom: 10
+    },
+
+    videoAccordion: {
+        width: "100%",
+    },
+    videoAccordionTitle: {
+        color: '#fff',
+    },
+    videoAccordionGroupTheme: {
+        colors: {
+            primary: '#fff',
+            background: "#3b3e44"
+        }
     }
 });

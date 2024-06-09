@@ -32,6 +32,9 @@
         "projectId": "ecd9d0a2-124b-42b3-ba02-f2d76e59e4cc"
       }
     },
-    "owner": "t44687"
+    "owner": "t44687",
+    "plugins": [
+      "expo-video"
+    ]
   }
 }

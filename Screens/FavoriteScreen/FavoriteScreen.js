@@ -151,7 +151,7 @@ export default function FavoriteScreen() {
                         postId: id,
                         artistId: post.item.user,
                         service: post.item.service,
-                        favoritePosts: favoritePosts
+                        favoritePosts: isPostLoading ? null : favoritePosts
                     }
                 )}
             />

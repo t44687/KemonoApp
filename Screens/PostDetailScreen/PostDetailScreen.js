@@ -2,7 +2,7 @@ import GlobalStyles from "../../Style/GlobalStyles";
 import {Alert, Image, Platform, Pressable, SafeAreaView, ScrollView, ActivityIndicator, View} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useEffect, useState} from "react";
-import {Block, Button, Text, Slider} from "galio-framework";
+import {Block, Button, Text, Slider, Accordion} from "galio-framework";
 import styles from "./PostDetailScreenStyles";
 import {htmlCodeConvertor} from "../../Component/HtmlCodeConvertor";
 import AutoAdjustHeightImage from "../../Component/AutoAdjustHeightImage";
@@ -10,14 +10,18 @@ import * as FileSystem from "expo-file-system"
 import HDImageViewerPopup from "../../Component/HDImageViewerPopup";
 import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 import CustomProgress from "../../Component/CustomProgress";
+import {AutoAdjustVideoPlayer} from "../../Component/AutoAdjustVideoPlayer";
+import { List } from 'react-native-paper';
 
 export default function () {
     const [postData, setPostData] = useState({})
     const [artistData, setArtistData] = useState({})
-    const [downloadProcess, setDownloadProcess] = useState(0)
+    const [downloadProcess, setDownloadProcess] = useState(1)
     const [showDownloadPopup, setShowDownloadPopup] = useState(false)
     const [detailImageUri, setDetailImageUri] = useState("")
     const [isLoading, setIsLoading] = useState(true)
+
+    const [playingVideo, setPlayingVideo] = useState("")
 
     const [isFavorited, setIsFavorited] = useState(false)
     const [isFavoritedLoading, setIsFavoritedLoading] = useState(false)
@@ -32,6 +36,11 @@ export default function () {
             fileName.includes(".jpg") ||
             fileName.includes(".jpeg") ||
             fileName.includes(".gif")
+    }
+
+    const isFileVideo = (fileName) => {
+
+        return fileName.includes(".mp4")
     }
 
     //region Async
@@ -90,7 +99,6 @@ export default function () {
     }
     const downloadFile = async (path, filename) => {
         setShowDownloadPopup(true)
-        setDownloadProcess(0)
 
         let uri = "https://c6.kemono.su/data" + path + "?f=" + filename
         console.log(uri)
@@ -101,6 +109,7 @@ export default function () {
             {cache: true},
             process => {
                 const percentProgress = process.totalBytesWritten / process.totalBytesExpectedToWrite
+                console.log(percentProgress)
                 setDownloadProcess(percentProgress)
             }
         )
@@ -111,9 +120,13 @@ export default function () {
             saveFile(result.uri, filename, result.headers["content-type"])
         } catch (e) {
             Alert.alert("Fail", `File ${filename} download failed, error:\n${e}`)
+            setDownloadProcess(0)
+            setShowDownloadPopup(false)
         }
     }
     const saveFile = async (uri, filename, type) => {
+        console.log("media type: " + type)
+
         if (Platform.OS === "android") {
             const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync()
 
@@ -209,13 +222,58 @@ export default function () {
             {Images}
         </Block>
     }
+
+    const PostContentAttachmentsVideos = () => {
+        if (postData["attachments"] === undefined){
+            return null
+        }
+
+        let Videos = postData["attachments"].map((attachment, index) => {
+            if (isFileVideo(attachment["name"])){
+                const uri = `https://c5.kemono.su/data${attachment["path"]}`
+                return <List.Accordion
+                        id={attachment["name"]}
+                        style={styles.videoAccordion}
+                        titleStyle={styles.videoAccordionTitle}
+                        theme={styles.videoAccordionGroupTheme}
+                        title={attachment["name"]}
+                        expanded={playingVideo === attachment["name"]}
+                        onPress={e => console.log("press")}
+                        onLongPress={(e) => {
+                            console.log(attachment["name"])
+                            setPlayingVideo(attachment["name"])
+                        }}
+                    >
+                        <AutoAdjustVideoPlayer
+                            uri={uri}
+                            play={true}
+                        />
+                    </List.Accordion>
+            }
+        })
+
+        if (Videos.length === 0){
+            return null
+        }
+
+        return <Block>
+            <Text style={[styles.postContentText, styles.postContentFile]}>Videos</Text>
+            <List.AccordionGroup>
+                {Videos}
+            </List.AccordionGroup>
+
+        </Block>
+    }
     const PostContentAttachmentsFileDownloads = () => {
         if (postData["attachments"] === undefined){
             return null
         }
 
         let FileDownloads = postData["attachments"].map((attachment) => {
-            return <Pressable onPress={() => downloadFile(attachment["path"], attachment["name"])}>
+            return <Pressable onPress={() => {
+                setDownloadProcess(0)
+                downloadFile(attachment["path"], attachment["name"])
+            }}>
                 <Text style={styles.postContentFileDownloadsText}>{attachment["name"]}</Text>
             </Pressable>
         })
@@ -239,6 +297,7 @@ export default function () {
             <Text style={[styles.postContentText, styles.postContentFile]}>Files</Text>
             {postData["file"] !== undefined && <AutoAdjustHeightImage styles={styles.postContentFileImage} uri={`https://img.kemono.su/thumbnail/data/${postData["file"]["path"]}`} />}
             <PostContentAttachmentsImages />
+            <PostContentAttachmentsVideos />
         </Block>
     }
     const DownloadPopup = () => {
@@ -273,6 +332,7 @@ export default function () {
         {isLoading && <CustomActivityIndicator />}
         {detailImageUri !== "" && <HDImageViewerPopup uri={detailImageUri} onClose={() => {setDetailImageUri("")}} />}
         {showDownloadPopup && <DownloadPopup />}
+        {/*<VideoPlayerPopup />*/}
         <ScrollView>
             <CreaterInfo />
             {!isLoading && <PostInfo />}
