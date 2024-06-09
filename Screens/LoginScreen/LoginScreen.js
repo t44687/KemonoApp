@@ -5,7 +5,7 @@ import globalStyles from "../../Style/GlobalStyles";
 import GlobalStyles from "../../Style/GlobalStyles";
 import {useEffect, useState} from "react";
 import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
-import {useNavigation} from "@react-navigation/native";
+import {useIsFocused, useNavigation} from "@react-navigation/native";
 import {useAuth} from "../../Context/AuthContext";
 
 const styles = StyleSheet.create({
@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
 
 export default function LoginScreen() {
     const navigation = useNavigation()
+    const isFocused = useIsFocused();
 
     const {isAuth, setIsAuth} = useAuth()
     const [username, setUsername] = useState()
@@ -69,18 +70,16 @@ export default function LoginScreen() {
     }
 
     const logout = () => {
-        // TODO call logout api
         setIsAuth(false)
     }
 
     useEffect(() => {
-        if (isAuth){ // already logged in, assume want to log out
+        if (isAuth){ // if isAuth is true, assume want to logout
             logout()
-        }
-        else{
+        }else{
             login() // try login (can't check httpOnly cookie)
         }
-    }, []);
+    }, [isFocused]);
     
     return (
         <Block style={globalStyles.container}>

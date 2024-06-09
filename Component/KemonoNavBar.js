@@ -20,6 +20,8 @@ const styles = StyleSheet.create({
 
 const getLoginState = () => {
     const { isAuth, _ } = useAuth()
+    if (isAuth === null)
+        return false
     return isAuth
 }
 
