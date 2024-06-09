@@ -15,7 +15,7 @@ export default function (){
 
     const navigation = useNavigation()
     const route = useRoute()
-    const {artistId, service} = route.params
+    const {artistId, service, favoritePosts} = route.params
 
     const getArtistData = () => {
         return fetch(`https://kemono.su/api/v1/${service}/user/${artistId}/profile`)
@@ -56,7 +56,8 @@ export default function (){
                 {
                     postId: id,
                     artistId: artistId,
-                    service: service
+                    service: service,
+                    favoritePosts: favoritePosts
                 }
             )}
         />

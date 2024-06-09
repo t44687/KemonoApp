@@ -5,17 +5,26 @@ import styles from "./Styles/PostsScreenStyles"
 import GlobalStyles from "../../Style/GlobalStyles";
 import PostCard from "../../Component/PostCard";
 import {useNavigation} from "@react-navigation/native";
+import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 
 export default function PostsScreen() {
     const navigation = useNavigation()
     
     const [posts, setPosts] = useState()
+    const [isGetPostLoading, setIsGetPostLoading] = useState(true)
 
     const getPosts = () => {
+        setIsGetPostLoading(true)
         return fetch('https://kemono.su/api/v1/posts')
             .then(response => response.json())
-            .then(json => setPosts(json))
-            .catch(error => console.error(error))
+            .then(json => {
+                setPosts(json)
+                setIsGetPostLoading(false)
+            })
+            .catch(error => {
+                console.error(error)
+                setIsGetPostLoading(false)
+            })
     }
 
     const createPostCard = (post) => {
@@ -33,7 +42,8 @@ export default function PostsScreen() {
                     {
                         postId: id,
                         artistId: post.item.user,
-                        service: post.item.service
+                        service: post.item.service,
+                        // favoritePosts: null
                     }
                 )}
             />
@@ -55,6 +65,7 @@ export default function PostsScreen() {
 
     return (
         <View style={GlobalStyles.container}>
+            {isGetPostLoading && <CustomActivityIndicator />}
             {generateArtistsCard()}
         </View>
     )

@@ -4,7 +4,7 @@ import globalStyles from "../../Style/GlobalStyles";
 import GlobalStyles from "../../Style/GlobalStyles";
 import {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useNavigation} from "@react-navigation/native";
+import {useIsFocused, useNavigation} from "@react-navigation/native";
 import ArtistsSearchForm from "../ArtistsScreen/Components/ArtistsSearchForm";
 import CustomActivityIndicator from "../../Component/CustomActivityIndicator";
 import Pagination from "../../Component/Pagination";
@@ -20,12 +20,16 @@ const styles = StyleSheet.create({
 
 export default function FavoriteScreen() {
     const navigation = useNavigation()
+    const isFocused = useIsFocused();
+
     const [session, setSession] = useState("")
     const [favoriteArtists, setFavoriteArtists] = useState([])
     const [favoritePosts, setFavoritePosts] = useState([])
     const [startIndex, setStartIndex] = useState(0)
     const [type, setType] = useState("artist")
     const [isLoading, setIsLoading] = useState(true)
+    const [isPostLoading, setIsPostLoading] = useState(true)
+    const [isArtistLoading, setIsArtistLoading] = useState(true)
     const [filter, setFilter] = useState({
         "sortBy": "updated_timestamp",
         "order": 0
@@ -48,15 +52,11 @@ export default function FavoriteScreen() {
                     return e
                 })
                 setFavoriteArtists(json)
-                if (favoritePosts.length > 0){
-                    setIsLoading(false)
-                }
+                setIsArtistLoading(false)
             })
             .catch(error => {
                 console.error(error)
-                if (favoritePosts.length > 0){
-                    setIsLoading(false)
-                }
+                setIsArtistLoading(false)
             })
     }
     const getFavoritePosts = () => {
@@ -75,15 +75,11 @@ export default function FavoriteScreen() {
                     return e
                 })
                 setFavoritePosts(json)
-                if (favoriteArtists.length > 0){
-                    setIsLoading(false)
-                }
+                setIsPostLoading(false)
             })
             .catch(error => {
                 console.error(error)
-                if (favoriteArtists.length > 0){
-                    setIsLoading(false)
-                }
+                setIsPostLoading(false)
             })
     }
 
@@ -132,7 +128,8 @@ export default function FavoriteScreen() {
                     'ArtistDetailScreen',
                     {
                         artistId: id,
-                        service: service
+                        service: service,
+                        favoritePosts: favoritePosts
                     }
                 )}
             />
@@ -153,7 +150,8 @@ export default function FavoriteScreen() {
                     {
                         postId: id,
                         artistId: post.item.user,
-                        service: post.item.service
+                        service: post.item.service,
+                        favoritePosts: favoritePosts
                     }
                 )}
             />
@@ -204,7 +202,7 @@ export default function FavoriteScreen() {
     useEffect(() => {
         getFavoriteArtists()
         getFavoritePosts()
-    }, []);
+    }, [isFocused]);
     useEffect(() => {
         if (type === "artist"){
             OnFilterChange("sortBy", "updated_timestamp")
@@ -212,11 +210,14 @@ export default function FavoriteScreen() {
             OnFilterChange("sortBy", "faved_seq")
         }
     }, [type]);
+    useEffect(() => {
+        console.log(isPostLoading, isArtistLoading)
+    }, [isPostLoading, isArtistLoading]);
     
     
     return (
         <Block  style={globalStyles.container}>
-            {!isLoading && <CustomActivityIndicator />}
+            {((type === "post" && isPostLoading) || (type === "artist" && isArtistLoading)) && <CustomActivityIndicator />}
             <Text style={[GlobalStyles.text, styles.Title]}>Favorite</Text>
             <GenerateArtistsCard 
                 dataList={type === "artist" ? favoriteArtists : favoritePosts}

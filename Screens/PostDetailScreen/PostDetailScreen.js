@@ -19,9 +19,12 @@ export default function () {
     const [detailImageUri, setDetailImageUri] = useState("")
     const [isLoading, setIsLoading] = useState(true)
 
+    const [isFavorited, setIsFavorited] = useState(false)
+    const [isFavoritedLoading, setIsFavoritedLoading] = useState(false)
+
     const navigation = useNavigation()
     const route = useRoute()
-    const {postId, artistId, service} = route.params
+    const {postId, artistId, service, favoritePosts = null} = route.params
 
     const isFileImage = (fileName) => {
 
@@ -31,6 +34,7 @@ export default function () {
             fileName.includes(".gif")
     }
 
+    //region Async
     const getPostDetail = () => {
         return fetch(`https://kemono.su/api/v1/${service}/user/${artistId}/post/${postId}`)
             .then(response => response.json())
@@ -49,6 +53,40 @@ export default function () {
             .catch(error => {
                 console.error(error)
             })
+    }
+    const checkFavoriteByAPI = () => {
+        setIsFavoritedLoading(true)
+        return fetch('https://kemono.su/api/v1/account/favorites?type=post')
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json()
+                } else if (response.status === 401) {
+                    navigation.navigate("Login")
+                    throw new Error("Unauthorized");
+                }
+            })
+            .then(json => {
+                json = json.map(e => {
+                    e.published_timestamp = Date.parse(e.published)
+                    return e
+                })
+                setIsFavorited(checkIsFavorited(json))
+                setIsFavoritedLoading(false)
+            })
+            .catch(error => {
+                console.error(error)
+                setIsFavoritedLoading(false)
+            })
+    }
+    const addFavoritePost = async () => {
+        fetch(`https://kemono.su/api/v1/favorites/post/${service}/${artistId}/${postId}`, {
+            method: 'POST',
+        }).then(checkFavoriteByAPI())
+    }
+    const removeFavoritePost = async () => {
+        fetch(`https://kemono.su/api/v1/favorites/post/${service}/${artistId}/${postId}`, {
+            method: 'DELETE',
+        }).then(checkFavoriteByAPI())
     }
     const downloadFile = async (path, filename) => {
         setShowDownloadPopup(true)
@@ -95,6 +133,11 @@ export default function () {
             }
         }
     }
+    //endregion
+
+    const checkIsFavorited = (favoritePosts) => {
+        return favoritePosts.find((e) => e["id"] === postId) !== undefined
+    }
 
     const CreaterInfo = () => {
         return <Block style={styles.artistInfoBlock}>
@@ -132,7 +175,11 @@ export default function () {
             <Text style={styles.postInfoBlockPostEdited}>Edited:       {postData["edited"] !== undefined && postData["edited"] !== null ? postData["edited"].replace("T", " ") : ""}</Text>
             <Block style={styles.postInfoBlockPostBtnGroup}>
                 <Button>Flagged</Button>
-                <Button>Favorite</Button>
+                {isFavoritedLoading ?
+                    <Button><ActivityIndicator color="#fff" /></Button> :
+                    isFavorited ?
+                    <Button onPress={removeFavoritePost}>Unfavorite</Button> :
+                    <Button onPress={addFavoritePost}>Favorite</Button>}
             </Block>
         </Block>
     }
@@ -210,12 +257,17 @@ export default function () {
         getPostDetail()
     }, [postId, artistId, service]);
     useEffect(() => {
+        if (favoritePosts === null){
+            checkFavoriteByAPI()
+        }
+        else if (favoritePosts.length > 0){
+            setIsFavorited(checkIsFavorited(favoritePosts))
+        }
+    }, [favoritePosts]);
+    useEffect(() => {
         console.log("getting artist data")
         getArtistData()
     }, [artistId, service]);
-    useEffect(() => {
-        console.log(detailImageUri)
-    },[detailImageUri])
 
     return <SafeAreaView style={GlobalStyles.container}>
         {isLoading && <CustomActivityIndicator />}
