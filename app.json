@@ -2,9 +2,9 @@
   "expo": {
     "name": "KemonoApp",
     "slug": "kemonoapp",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Kemono_favicon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -25,7 +25,7 @@
       "package": "com.t44687.kemonoapp"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/Kemono_favicon.png"
     },
     "extra": {
       "eas": {
