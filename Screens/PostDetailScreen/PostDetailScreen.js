@@ -65,27 +65,33 @@ export default function () {
     }
     const checkFavoriteByAPI = () => {
         setIsFavoritedLoading(true)
-        return fetch('https://kemono.su/api/v1/account/favorites?type=post')
-            .then(response => {
-                if (response.status === 200) {
-                    return response.json()
-                } else if (response.status === 401) {
-                    navigation.navigate("Login")
-                    throw new Error("Unauthorized");
-                }
-            })
-            .then(json => {
-                json = json.map(e => {
-                    e.published_timestamp = Date.parse(e.published)
-                    return e
-                })
-                setIsFavorited(checkIsFavorited(json))
-                setIsFavoritedLoading(false)
-            })
-            .catch(error => {
-                console.error(error)
-                setIsFavoritedLoading(false)
-            })
+
+        // wait 1 second to give more time for favorite or unfavorite
+        setTimeout(() => {
+                return fetch('https://kemono.su/api/v1/account/favorites?type=post')
+                    .then(response => {
+                        if (response.status === 200) {
+                            return response.json()
+                        } else if (response.status === 401) {
+                            navigation.navigate("Login")
+                            throw new Error("Unauthorized");
+                        }
+                    })
+                    .then(json => {
+                        json = json.map(e => {
+                            e.published_timestamp = Date.parse(e.published)
+                            return e
+                        })
+                        setIsFavorited(checkIsFavorited(json))
+                        setIsFavoritedLoading(false)
+                    })
+                    .catch(error => {
+                        console.error(error)
+                        setIsFavoritedLoading(false)
+                    })
+            },
+            1000
+        )
     }
     const addFavoritePost = async () => {
         fetch(`https://kemono.su/api/v1/favorites/post/${service}/${artistId}/${postId}`, {
@@ -202,14 +208,15 @@ export default function () {
             return null
         }
 
-        let Images = postData["attachments"].map((attachment) => {
+        let Images = []
+        postData["attachments"].forEach((attachment) => {
             if (isFileImage(attachment["name"])){
-                return <Pressable onPress={() => setDetailImageUri(`https://c5.kemono.su/data${attachment["path"]}?f=${attachment["name"]}`)}>
+                Images.push(<Pressable onPress={() => setDetailImageUri(`https://c5.kemono.su/data${attachment["path"]}?f=${attachment["name"]}`)}>
                     <AutoAdjustHeightImage
                         styles={styles.postContentFileImage}
                         uri={`https://img.kemono.su/thumbnail/data/${attachment["path"]}`}
                     />
-                </Pressable>
+                </Pressable>)
             }
         })
 
@@ -218,7 +225,6 @@ export default function () {
         }
 
         return <Block>
-            <Text style={[styles.postContentText, styles.postContentFile]}>Images</Text>
             {Images}
         </Block>
     }
@@ -228,10 +234,11 @@ export default function () {
             return null
         }
 
-        let Videos = postData["attachments"].map((attachment, index) => {
+        let Videos = []
+        postData["attachments"].forEach((attachment, index) => {
             if (isFileVideo(attachment["name"])){
                 const uri = `https://c5.kemono.su/data${attachment["path"]}`
-                return <List.Accordion
+                Videos.push(<List.Accordion
                         id={attachment["name"]}
                         style={styles.videoAccordion}
                         titleStyle={styles.videoAccordionTitle}
@@ -248,10 +255,11 @@ export default function () {
                             uri={uri}
                             play={true}
                         />
-                    </List.Accordion>
+                    </List.Accordion>)
             }
         })
 
+        console.log("video", Videos.length)
         if (Videos.length === 0){
             return null
         }
@@ -291,13 +299,13 @@ export default function () {
     const PostContent = () => {
 
         return <Block style={styles.postContentBlock}>
-            <Text style={[styles.postContentText, styles.postContentContent]}>Content</Text>
+            <PostContentAttachmentsVideos />
+            {postData["content"] !== "" && <Text style={[styles.postContentText, styles.postContentContent]}>Content</Text>}
             <Text style={[styles.postContentText]}>{htmlCodeConvertor(postData["content"])}</Text>
             <PostContentAttachmentsFileDownloads />
             <Text style={[styles.postContentText, styles.postContentFile]}>Files</Text>
             {postData["file"] !== undefined && <AutoAdjustHeightImage styles={styles.postContentFileImage} uri={`https://img.kemono.su/thumbnail/data/${postData["file"]["path"]}`} />}
             <PostContentAttachmentsImages />
-            <PostContentAttachmentsVideos />
         </Block>
     }
     const DownloadPopup = () => {
